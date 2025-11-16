@@ -8,6 +8,7 @@ on:
 jobs:
   sync:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout your repo
         uses: actions/checkout@v3
@@ -21,10 +22,18 @@ jobs:
           rm -rf zips
           cp -r upstream-jposta/lib/zips ./zips
 
-      - name: Commit & Push if changed
+      - name: Configure Git
         run: |
           git config user.name "GitHub Actions"
           git config user.email "actions@github.com"
+
+      - name: Commit & Push if changed
+        env:
+          TOKEN: ${{ secrets.ACTIONS_PAT }}
+        run: |
           git add zips
-          git diff --cached --quiet || git commit -m "Sync zips from upstream"
-          git push
+          git diff --cached --quiet && echo "No changes to commit" || (
+            git commit -m "Sync zips from upstream"
+            git remote set-url origin https://x-access-token:${TOKEN}@github.com/${{ github.repository }}
+            git push origin main
+          )
