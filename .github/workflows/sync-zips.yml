@@ -1,0 +1,30 @@
+name: Sync jposta zips
+
+on:
+  schedule:
+    - cron: '0 3 * * *' # 毎日3時（UTC）に実行
+  workflow_dispatch: # 手動実行も可能
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout your repo
+        uses: actions/checkout@v3
+
+      - name: Clone upstream jposta
+        run: |
+          git clone --depth=1 https://github.com/nickichi/jposta.git upstream-jposta
+
+      - name: Copy zips folder
+        run: |
+          rm -rf zips
+          cp -r upstream-jposta/lib/zips ./zips
+
+      - name: Commit & Push if changed
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          git add zips
+          git diff --cached --quiet || git commit -m "Sync zips from upstream"
+          git push
