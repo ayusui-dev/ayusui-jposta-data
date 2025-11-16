@@ -34,6 +34,6 @@ jobs:
           git add zips
           git diff --cached --quiet && echo "No changes to commit" || (
             git commit -m "Sync zips from upstream"
-            git remote set-url origin https://x-access-token:${TOKEN}@github.com/${{ github.repository }}
+            git remote set-url origin https://x-access-token:${TOKEN}@github.com/ayusui-dev/ayusui-jposta-data.git
             git push origin main
           )
